@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es2019",
+    "removeComments": true,
+    //"sourceMap": true,
+    "inlineSourceMap": true,
+    "preserveConstEnums": true,
+    "outDir": "dist/",
+    "allowSyntheticDefaultImports": true,
+    "lib": ["es6", "es2019", "dom"]
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "/node_modules"
+  ]
+}
