@@ -2,6 +2,7 @@ import {GuildMember} from "discord.js"
 import {chain} from "ramda";
 import * as crypto from "crypto"
 import R = require("ramda");
+import {Command} from "discord-akairo";
 
 export const boxContents = (...texts: string[]) => { // borrowed from another bot, thanks xetera o/
     const getLines = (text: string) => text.split("\n").map((line) => line.length);
@@ -20,6 +21,16 @@ export const isOwner = (id: string): boolean => (process.env.OWNERS || "13664413
 
 export const isMod = (member: GuildMember): boolean =>
     member.hasPermission("KICK_MEMBERS") || isOwner(member.id)
+
+
+export const formatHelp = (mod: Command) => {
+    if (Array.isArray(mod.description)) {
+        if (mod.description.length === 1) return `${process.env.PREFIX || "c!"}${mod.id}: ${mod.description[0]}`
+        else return `${process.env.PREFIX || "c!"}${mod.id} ${mod.description[0]}: ${mod.description[1]}`
+    }
+    return `${process.env.PREFIX || "c!"}${mod.id}: ${mod.description}`
+}
+
 
 /**
  * Ensures a string has an appropriate length

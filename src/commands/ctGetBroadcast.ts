@@ -10,7 +10,6 @@ class CTGetBroadcast extends Command {
             args: [{
                 id: "id",
                 type: "string",
-                prompt: true
             },{
                 id: "list",
                 type: "string"
@@ -18,10 +17,18 @@ class CTGetBroadcast extends Command {
         });
     }
 
-    description = "Returns a broadcast."
+    description = ["[id]", "Returns a broadcast."]
 
     async exec(message, args: ArgumentOptions) {
+        if (args["id"] === null) {
+            return message.channel.send("No BroadcastID provided.")
+        }
+
         const broadcast: Broadcast = await getBroadcast(args["id"])
+
+        if (broadcast === undefined) {
+            return message.channel.send("Invalid BroadcastID provided.")
+        }
 
         const embed = new MessageEmbed()
             .setTitle(broadcast.tour.name)

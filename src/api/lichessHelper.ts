@@ -1,4 +1,5 @@
 import axios from "axios"
+import {JSDOM} from "jsdom"
 import * as ndjsonParser from "ndjson-parse"
 
 // base endpoints
@@ -6,6 +7,8 @@ const lichessEndpoint = "https://lichess.org"
 
 // constructed endpoint urls
 const lichessBroadcastEndpoint = `${lichessEndpoint}/api/broadcast`
+
+const PGN_SEPARATOR = "\n\n\n"
 
 export type BroadcastTour = {
     id: string,
@@ -38,6 +41,10 @@ export type Broadcast = {
     rounds: BroadcastRound[],
     status: string, // used to display the current round
     completed: boolean // flag to indicate all rounds completed
+}
+
+export type Study = {
+    pgns: string[]
 }
 
 const buildBroadcast = (entry: JSON): Broadcast => {
@@ -116,8 +123,52 @@ export const getCurrentBroadcasts = async (count: number = 20): Promise<Broadcas
 
 export const getBroadcast = async (id: string): Promise<Broadcast | undefined> => {
     const resp = await axios.get(`${lichessEndpoint}/broadcast/-/${id}`)
-    if (resp.status !== 200) {
+        .catch(() => undefined)
+    if (resp === undefined || resp.status !== 200) {
         return undefined
     }
     return buildBroadcast(resp.data)
+
+
 }
+
+export const getBroadcastFromStudy = async (id: string): Promise<Broadcast | undefined> => {
+    const resp = await axios.get(`${lichessEndpoint}/broadcast/-/-/${id}`)
+        .catch(() => undefined)
+    if (resp === undefined || resp.status !== 200) {
+        return undefined
+    }
+    const r = new JSDOM(resp.data)
+    const rootScripts = r.window.document.body.querySelectorAll("script")
+    // console.log(rootScripts.length)
+    let broadcastRaw = ""
+    const target = "lichess.relay="
+    rootScripts.forEach((item) => {
+        if (item.innerHTML === undefined) return;
+        if (item.innerHTML.startsWith(target)) {
+            broadcastRaw = item.innerHTML.substring(target.length, item.innerHTML.length)
+        }
+    })
+    // console.log(broadcastRaw)
+    const rJson: JSON = JSON.parse(broadcastRaw)
+    const relay: JSON = rJson["relay"]
+    // console.log(relay)
+    return buildBroadcast(relay)
+}
+
+export const getStudyPGN = async (id: string): Promise<string | undefined> => {
+    const resp = await axios.get(`${lichessEndpoint}/study/${id}.pgn`)
+        .catch(() => undefined)
+    if (resp === undefined || resp.status !== 200) {
+        return undefined
+    }
+    return resp.data
+}
+
+export const parseStudyPGN = (rawStudyPGN: string): Study => {
+    const pgns = rawStudyPGN.split(PGN_SEPARATOR)
+    return {
+        pgns: pgns
+    }
+}
+

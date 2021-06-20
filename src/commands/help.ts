@@ -2,6 +2,7 @@ import {Command} from 'discord-akairo';
 import {MessageEmbed, GuildMember, ImageURLOptions} from "discord.js";
 import {commandCollection} from "../index";
 import {botMainColor} from "../constants";
+import {formatHelp} from "../utils";
 
 class HelpCommand extends Command {
     constructor() {
@@ -20,13 +21,13 @@ class HelpCommand extends Command {
         }
 
         const commandList: string[] = commandCollection.map(
-            (mod) => `${process.env.PREFIX || "$"}${mod.id}: ${mod.description}`
+            (mod) => formatHelp(mod)
         )
         // TODO: make this have pages and categories
 
         const embed = new MessageEmbed()
             .setFooter(invoker.displayName, invoker.user.avatarURL(avatarOptions))
-            .addField("Commands", commandList.join("\n"))
+            .addField("Commands", `[required] (optional)\n\n${commandList.join("\n")}`)
             .setColor(botMainColor)
 
         return message.reply(embed);

@@ -15,7 +15,7 @@ class CTListBroadcasts extends Command {
         });
     }
 
-    description = "Returns a list of broadcasts. [Up to 20]"
+    description = ["(amt) (\"list\")", "Returns a list of broadcasts. [Default 20]"]
 
     async exec(message, args: ArgumentOptions) {
         const broadcasts: Broadcast[] = await getCurrentBroadcasts(args["nb"])

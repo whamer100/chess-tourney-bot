@@ -1,11 +1,11 @@
 import { CommandHandler } from "discord-akairo";
-import { boxContents } from "./utils";
+import {boxContents, formatHelp} from "./utils";
 import { BotClient } from "./index";
 
 const logStartup = (client: BotClient) => {
     const stat = `Logged in as ${client.user.tag} [id:${client.user.id}]`;
     const commands = client.commandHandler.modules.map(
-        (mod) => `${process.env.PREFIX || "$"}${mod.id}: ${mod.description}`
+        (mod) => formatHelp(mod)
     );
     const out = boxContents("Started Up!", stat, commands.join("\n"));
     console.log(out);
